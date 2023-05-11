@@ -1,5 +1,5 @@
 import { AuthPage, ThemedTitleV2 } from "@refinedev/mantine";
-import { AppIcon } from "../../components/app-icon";
+import { AppIcon } from "~/components/app-icon";
 
 export const Login = () => {
   return (

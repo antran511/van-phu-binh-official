@@ -1,11 +1,14 @@
 import { AuthBindings } from "@refinedev/core";
+import { AuthHelper } from '@tspvivek/refine-directus';
+import { directusClient } from './directusClient';
 
-export const TOKEN_KEY = "refine-auth";
+const directusAuthHelper = AuthHelper(directusClient);
 
 export const authProvider: AuthBindings = {
-  login: async ({ username, email, password }) => {
-    if ((username || email) && password) {
-      localStorage.setItem(TOKEN_KEY, username);
+  login: async ({ email, password }) => {
+    const { access_token } = await directusAuthHelper.login(email, password);
+
+    if (access_token) {
       return {
         success: true,
         redirectTo: "/",
@@ -21,14 +24,14 @@ export const authProvider: AuthBindings = {
     };
   },
   logout: async () => {
-    localStorage.removeItem(TOKEN_KEY);
+    await directusAuthHelper.logout();
     return {
       success: true,
       redirectTo: "/login",
     };
   },
   check: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = await directusAuthHelper.getToken();
     if (token) {
       return {
         authenticated: true,
@@ -42,12 +45,11 @@ export const authProvider: AuthBindings = {
   },
   getPermissions: async () => null,
   getIdentity: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
+    const data = await directusAuthHelper.me({ fields: [ '*.*' ] });
+    if (data) {
       return {
-        id: 1,
-        name: "John Doe",
-        avatar: "https://i.pravatar.cc/300",
+        id: data.id,
+        name: data.name,
       };
     }
     return null;

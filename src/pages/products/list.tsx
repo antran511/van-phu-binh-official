@@ -7,6 +7,7 @@ import { useModalForm, List } from "@refinedev/mantine";
 import { Button } from "@mantine/core";
 import { CreateItemModal } from "~/components/items";
 import { isNotEmpty } from "@mantine/form";
+import { MRT_Localization_VI } from "mantine-react-table/locales/vi";
 
 export const ProductList: React.FC<IResourceComponentsProps> = () => {
   const { tableQueryResult } = useTable<Item>({
@@ -81,11 +82,6 @@ export const ProductList: React.FC<IResourceComponentsProps> = () => {
         columns={columns}
         data={items}
         enableFullScreenToggle={false}
-        renderTopToolbarCustomActions={() => (
-          <Button size="sm" onClick={() => showCreateModal()}>
-            + Tạo sản phẩm
-          </Button>
-        )}
         enableColumnResizing
         mantinePaperProps={{
           shadow: "none", //use a larger shadow
@@ -95,13 +91,14 @@ export const ProductList: React.FC<IResourceComponentsProps> = () => {
             border: "none",
           },
         }}
+        localization={MRT_Localization_VI}
         mantineTopToolbarProps={{
           sx: {
             ".mantine-1knjhw7": {
               paddingRight: 0,
               paddingLeft: 0,
               flexDirection: "row-reverse",
-            }
+            },
           },
         }}
       />

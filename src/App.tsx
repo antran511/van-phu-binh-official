@@ -30,12 +30,12 @@ import { Header } from "./components/header";
 import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
-import { dataProvider  } from '@tspvivek/refine-directus';
-import { directusClient } from './directusClient';
-import { SaleOrderList } from "./pages/sale-orders";
+import { dataProvider } from "@tspvivek/refine-directus";
+import { directusClient } from "./directusClient";
+import { SaleOrderList, SaleOrderCreate } from "./pages/sale-orders";
 import { PartnerList } from "./pages/partners";
 import { ProductList } from "./pages/products";
-import { SaleOrderItemList } from './pages/sale-order-items';
+import { SaleOrderItemList } from "./pages/sale-order-items";
 
 function App() {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -68,9 +68,13 @@ function App() {
               colorScheme: colorScheme,
               globalStyles: () => ({
                 main: {
-                  padding: "0",
+                  backgroundColor: "white",
                 },
-            }), }}
+                // "main.Card": {
+                //   padding: "0",
+                // },
+              }),
+            }}
             withNormalizeCSS
             withGlobalStyles
           >
@@ -99,10 +103,14 @@ function App() {
                     list: "/partners",
                   },
                   {
+                    name: "sale_orders",
+                    list: "/sale_orders",
+                    create: "/sale_orders/create",
+                  },
+                  {
                     name: "sale_order_items",
                     list: "/sale_order_items",
                   },
-                  
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -116,7 +124,7 @@ function App() {
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ThemedLayoutV2
-                          Header={() => <Header sticky />}
+                          Header={() => <div></div>}
                           Title={({ collapsed }) => (
                             <ThemedTitleV2
                               collapsed={collapsed}
@@ -139,6 +147,10 @@ function App() {
                     </Route>
                     <Route path="/partners">
                       <Route index element={<PartnerList />} />
+                    </Route>
+                    <Route path="/sale_orders">
+                      <Route index element={<SaleOrderList />} />
+                      <Route path="create" element={<SaleOrderCreate />} />
                     </Route>
                     <Route path="/sale_order_items">
                       <Route index element={<SaleOrderItemList />} />

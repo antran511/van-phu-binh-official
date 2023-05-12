@@ -7,7 +7,9 @@ import { List, useModalForm } from "@refinedev/mantine";
 import { Button } from "@mantine/core";
 import { CreateSaleOrderModal } from "~/components/sale-orders";
 import { isNotEmpty } from "@mantine/form";
-import { randomId } from '@mantine/hooks';
+import { randomId } from "@mantine/hooks";
+import { IconPencil } from "@tabler/icons-react";
+
 interface SaleOrderItem {
   product: number;
   quantity: number;
@@ -18,25 +20,27 @@ export const SaleOrderList: React.FC<IResourceComponentsProps> = () => {
   const { tableQueryResult } = useTable<SaleOrder>({
     resource: "sale_orders",
     meta: {
-      fields: ["*","customer.name"],
+      fields: ["*", "customer.name"],
     },
     syncWithLocation: true,
   });
   const saleOrders = tableQueryResult?.data?.data ?? [];
   const initialValues = {
     customer: 0,
-    sale_order_items: [{
-      product: 0,
-      quantity: 0,
-      price: 0,
-      unit_price: 0,
-      key: randomId()
-    } as SaleOrderItem]
+    sale_order_items: [
+      {
+        product: 0,
+        quantity: 0,
+        price: 0,
+        unit_price: 0,
+        key: randomId(),
+      } as SaleOrderItem,
+    ],
   };
 
   const createModalForm = useModalForm({
-    refineCoreProps: { action: "create", resource: "sale_orders"},
-    initialValues
+    refineCoreProps: { action: "create", resource: "sale_orders" },
+    initialValues,
   });
   const {
     modal: { show: showCreateModal },
@@ -52,7 +56,6 @@ export const SaleOrderList: React.FC<IResourceComponentsProps> = () => {
         accessorKey: "customer.name", //access nested data with dot notation
         header: "Khách hàng",
       },
-
     ],
     []
   );
@@ -61,14 +64,20 @@ export const SaleOrderList: React.FC<IResourceComponentsProps> = () => {
   }
   return (
     <List>
-      <CreateSaleOrderModal {...createModalForm} />
+      {/* <CreateSaleOrderModal {...createModalForm} /> */}
       <MantineReactTable
+        mantineTableContainerProps={{
+          sx: {
+            height: "72vh",
+          },
+        }}
         columns={columns}
         data={saleOrders}
         enableFullScreenToggle={false}
-        renderTopToolbarCustomActions={() => (
-          <Button onClick={() => showCreateModal()}>+ Tạo đơn hàng </Button>
-        )}
+        // renderTopToolbarCustomActions={() => (
+        //   <Button onClick={() => showCreateModal()}>+ Tạo đơn hàng </Button>
+        //   // <CreateButton resource="sale-orders" />
+        // )}
         mantinePaperProps={{
           shadow: "none", //use a larger shadow
           //customize paper styles
@@ -80,14 +89,18 @@ export const SaleOrderList: React.FC<IResourceComponentsProps> = () => {
         initialState={{
           showGlobalFilter: true, //show the global filter by default
         }}
-        
+        enableEditing
+        enableColumnResizing
+        icons={{
+          IconEdit: () => <IconPencil size={18} />,
+        }}
         mantineTopToolbarProps={{
           sx: {
             ".mantine-1knjhw7": {
               paddingRight: 0,
               paddingLeft: 0,
               flexDirection: "row-reverse",
-            }
+            },
           },
         }}
       />

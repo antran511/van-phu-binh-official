@@ -1,36 +1,48 @@
-import { IResourceComponentsProps, useList } from "@refinedev/core";
+import { IResourceComponentsProps } from "@refinedev/core";
 import { useTable } from "@refinedev/core";
 import { SaleOrderItem } from "~/utility/interface";
 import { useMemo } from "react";
 import { MantineReactTable, MRT_ColumnDef } from "mantine-react-table";
 import { useModalForm, List } from "@refinedev/mantine";
 import { Button } from "@mantine/core";
-import { isNotEmpty } from "@mantine/form";
 import { CreateSaleOrderModal } from "~/components/sale-orders";
-import { randomId } from '@mantine/hooks';
+import { randomId } from "@mantine/hooks";
 import { EditSaleOrderModal } from "~/components/sale-orders";
+import { LoadingOverlay } from "@mantine/core";
 
 export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
   const { tableQueryResult } = useTable<SaleOrderItem>({
     resource: "sale_order_items",
     meta: {
-      fields: ["id","product.name", "sale_order.customer.name", "sale_order.date_created", "unit_price", "quantity", "sale_order.id"],
-    }
+      fields: [
+        "id",
+        "product.name",
+        "sale_order.customer.name",
+        "sale_order.date_created",
+        "unit_price",
+        "quantity",
+        "sale_order.id",
+      ],
+    },
+    queryOptions: {
+      onSuccess: (data) => {},
+    },
   });
   const partners = tableQueryResult?.data?.data ?? [];
   const initialValues = {
     customer: 0,
-    sale_order_items: [{
-      id: 0,
-      product: 0,
-      quantity: 0,
-      unit_price: 0,
-      key: randomId()
-    }]
+    sale_order_items: [
+      {
+        product: 1,
+        quantity: 0,
+        unit_price: 0,
+        key: randomId(),
+      },
+    ],
   };
 
   const createModalForm = useModalForm({
-    refineCoreProps: { action: "create", resource: "sale_orders"},
+    refineCoreProps: { action: "create", resource: "sale_orders" },
     initialValues,
   });
   const {
@@ -38,7 +50,21 @@ export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
   } = createModalForm;
 
   const editModalForm = useModalForm({
-    refineCoreProps: { action: "edit", resource: "sale_orders", meta: { fields: ["id", "customer", "sale_order_items.product", "sale_order_items.quantity", "sale_order_items.unit_price"]}},
+    refineCoreProps: {
+      action: "edit",
+      resource: "sale_orders",
+      meta: {
+        fields: [
+          "id",
+          "customer",
+          "sale_order_items.id",
+          "sale_order_items.product",
+          "sale_order_items.product",
+          "sale_order_items.quantity",
+          "sale_order_items.unit_price",
+        ],
+      },
+    },
     initialValues,
   });
   const {
@@ -52,7 +78,7 @@ export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
         header: "Ngày tạo",
         Cell: ({ cell }) => {
           const date = new Date(cell.getValue<string>());
-          return <div>{date.toLocaleDateString('vi-VN')}</div>;
+          return <div>{date.toLocaleDateString("vi-VN")}</div>;
         },
       },
       {
@@ -70,20 +96,25 @@ export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
       {
         accessorKey: "quantity",
         header: "Số lượng",
-      }
+      },
     ],
     []
   );
-  if (tableQueryResult?.isLoading) {
-    return <div>Loading...</div>;
-  }
+
   return (
     <List>
-      <CreateSaleOrderModal {...createModalForm} />
-      <EditSaleOrderModal {...editModalForm} />
+      <LoadingOverlay
+        visible={tableQueryResult?.isLoading}
+        opacity={0.8}
+        zIndex={100}
+      />
+      {/* <CreateSaleOrderModal {...createModalForm} />
+      <EditSaleOrderModal {...editModalForm} /> */}
       <MantineReactTable
         columns={columns}
         data={partners}
+        enableFilters={false}
+        globalFilterModeOptions={["fuzzy", "startsWith"]}
         enableFullScreenToggle={false}
         renderTopToolbarCustomActions={() => (
           <Button onClick={() => showCreateModal()}>+ Tạo đối tác </Button>
@@ -97,6 +128,7 @@ export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
             border: "none",
           },
         }}
+        enableEditing
         initialState={{
           showGlobalFilter: true, //show the global filter by default
         }}
@@ -105,7 +137,7 @@ export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
         mantineTableBodyRowProps={({ row }) => ({
           onClick: () => showEditModal(row.original.sale_order.id),
           sx: {
-            cursor: 'pointer', //you might want to change the cursor too when adding an onClick
+            cursor: "pointer", //you might want to change the cursor too when adding an onClick
           },
         })}
         mantineTopToolbarProps={{
@@ -114,7 +146,7 @@ export const SaleOrderItemList: React.FC<IResourceComponentsProps> = () => {
               paddingRight: 0,
               paddingLeft: 0,
               flexDirection: "row-reverse",
-            }
+            },
           },
         }}
       />
